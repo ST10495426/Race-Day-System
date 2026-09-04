@@ -17,7 +17,8 @@ RaceDay is a full-stack event management platform designed for the South African
 - View their own enrolments and results
 
 ## CI/CD
-![CI Build](link-to-your-screenshot-image)
+![CI Build]<img width="428" height="65" alt="green light" src="https://github.com/user-attachments/assets/fa3f87ec-b2f8-496f-924a-9e49f1859284" />
+
 
 ## Video Presentation
 [YouTube Video Link](https://youtu.be/SjGEt7v-eVg)
