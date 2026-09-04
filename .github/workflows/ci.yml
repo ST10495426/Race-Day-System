@@ -34,16 +34,16 @@ jobs:
     
     - name: Check API endpoint plan exists
       run: |
-        if [ ! -f "docs/API_Endpoint_Plan.pdf" ]; then
-          echo " API_Endpoint_Plan.pdf not found in docs folder!"
+        if [ ! -f "docs/API Endpoint Plan.pdf" ]; then
+          echo " API Endpoint Plan.pdf not found in docs folder!"
           exit 1
         else
-          echo " API_Endpoint_Plan.pdf found"
+          echo " API Endpoint Plan.pdf found"
         fi
     
     - name: Check SQL script exists
       run: |
-        if [ ! -f "docs/RaceDay_Schema.sql" ]; then
+        if [ ! -f "docs/RaceDay Schema.sql" ]; then
           echo " RaceDay Schema.sql not found in docs folder!"
           exit 1
         else
