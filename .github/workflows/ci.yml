@@ -1,0 +1,54 @@
+name: CI - Validate Repository Structure
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Check docs folder exists
+      run: |
+        if [ ! -d "docs" ]; then
+          echo " docs folder not found!"
+          exit 1
+        else
+          echo " docs folder exists"
+        fi
+    
+    - name: Check ERD exists
+      run: |
+        if [ ! -f "docs/ERD.png" ]; then
+          echo " ERD.png not found in docs folder!"
+          exit 1
+        else
+          echo " ERD.png found"
+        fi
+    
+    - name: Check API endpoint plan exists
+      run: |
+        if [ ! -f "docs/API_Endpoint_Plan.pdf" ]; then
+          echo " API_Endpoint_Plan.pdf not found in docs folder!"
+          exit 1
+        else
+          echo " API_Endpoint_Plan.pdf found"
+        fi
+    
+    - name: Check SQL script exists
+      run: |
+        if [ ! -f "docs/RaceDay_Schema.sql" ]; then
+          echo " RaceDay Schema.sql not found in docs folder!"
+          exit 1
+        else
+          echo " RaceDay Schema.sql found"
+        fi
+    
+    - name: All checks passed
+      run: echo " All required documents present! Build successful!"
