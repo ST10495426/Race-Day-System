@@ -1,0 +1,30 @@
+# Visual Studio / VS Code
+.vs/
+.vscode/
+*.user
+*.suo
+*.pdb
+
+# Build outputs
+bin/
+obj/
+Debug/
+Release/
+
+# Database files
+*.mdf
+*.ldf
+*.bak
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# IDE
+*.sln
+*.csproj
+*.config
+appsettings.json
+
+# Node modules (if any)
+node_modules/
