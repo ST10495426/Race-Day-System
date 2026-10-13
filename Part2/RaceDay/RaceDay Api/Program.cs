@@ -10,6 +10,33 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<RaceDayDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// ============================================
+// SESSION CONFIGURATION
+// ============================================
+// Session stores user ID and role on the server, keyed by a cookie
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);   // Session expires after 30 minutes of inactivity
+    options.Cookie.HttpOnly = true;                   // JS cannot access cookie (security)
+    options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+});
+
+// ============================================
+// CORS (for Part 3 MVC to call this API)
+// ============================================
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowMvc", policy =>
+    {
+        policy.WithOrigins("https://localhost:7000")  // Will update in Part 3
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();                     // Required for cookies
+    });
+});
+
 
 // Add services to the container and swagger.
 
@@ -30,10 +57,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowMvc");
+
+app.UseSession();   // MUST come before UseAuthorization
+
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
-
 
