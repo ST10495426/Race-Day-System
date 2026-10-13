@@ -20,11 +20,7 @@ Release/
 .DS_Store
 Thumbs.db
 
-# IDE
-*.sln
-*.csproj
-*.config
-appsettings.json
+
 
 # Node modules (if any)
 node_modules/
