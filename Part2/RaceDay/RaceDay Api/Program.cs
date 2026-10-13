@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RaceDay_Api.Data;
+using RaceDay.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,8 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Register custom services for dependency injection
+builder.Services.AddScoped<PasswordHasher>();
 
 // Add services to the container and swagger.
 
