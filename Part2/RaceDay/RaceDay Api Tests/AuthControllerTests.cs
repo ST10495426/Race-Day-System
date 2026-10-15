@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using RaceDay_Api.Controllers;
+using RaceDay_Api.Data;
 using RaceDay_Api.DTOs;
-using RaceDay_Api_Tests.Helpers;
 using RaceDay_Api.Services;
-using Xunit;
+using RaceDay_Api_Tests.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xunit;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RaceDay_Api_Tests
@@ -19,11 +21,18 @@ namespace RaceDay_Api_Tests
     public class AuthControllerTests
     {
         // Helper to create a controller with a fresh database
-        private AuthController CreateController(out Data.RaceDayDbContext context)
+        private AuthController CreateController(out RaceDayDbContext context)
         {
             context = TestDbContextFactory.Create();
             var hasher = new PasswordHasher();
-            return new AuthController(context, hasher);
+            var controller = new AuthController(context, hasher);
+
+            // Set up HttpContext with a mock session
+            var httpContext = new DefaultHttpContext();
+            httpContext.Session = SessionMock.CreateEmpty();
+            controller.ControllerContext = new ControllerContext { HttpContext = httpContext };
+
+            return controller;
         }
 
         private static RegisterRequest ValidRegisterRequest(string role = "Organiser", string email = "hlatse@testraceday.co.za")

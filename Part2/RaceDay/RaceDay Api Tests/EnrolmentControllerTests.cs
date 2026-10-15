@@ -4,6 +4,7 @@ using RaceDay_Api.Controllers;
 using RaceDay_Api.DTOs;
 using RaceDay_Api.Models;
 using RaceDay_Api_Tests.Helpers;
+using RaceDay_Api.Data;
 using Xunit;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace RaceDay_Api_Tests
     /// </summary>
     public class EnrolmentControllerTests
     {
-        private EnrolmentController CreateControllerWithSession(out Data.RaceDayDbContext context, int userId, string role)
+        private EnrolmentController CreateControllerWithSession(out RaceDayDbContext context, int userId, string role)
         {
             context = TestDbContextFactory.Create();
 

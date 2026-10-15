@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
+using RaceDay_Api.Data;
 using RaceDay_Api.Controllers;
 using RaceDay_Api.DTOs;
 using RaceDay_Api.Filters;
@@ -24,7 +25,7 @@ namespace RaceDay_Api_Tests
     /// </summary>
     public class EventControllerTests
     {
-        private EventController CreateControllerWithSession(out Data.RaceDayDbContext context, int? userId, string? role)
+        private EventController CreateControllerWithSession(out RaceDayDbContext context, int? userId, string? role)
         {
             context = TestDbContextFactory.Create();
 
