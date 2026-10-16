@@ -9,9 +9,10 @@ using RaceDay_Api.Services;
 
 namespace RaceDay_Api.Controllers
 {
-    // Handles event management.
-    // Public: viewing events.
-    // Organiser only: create, update, delete.
+    /// <summary>
+    /// Handles event management.
+    /// Public endpoints allow anyone to view events. Organiser endpoints allow CRUD operations.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class EventController : ControllerBase
@@ -23,10 +24,12 @@ namespace RaceDay_Api.Controllers
             _context = context;
         }
 
-        // ============================================
+
         // GET: /api/events
-        // Public - get all events with categories
-        // ============================================
+        /// <summary>
+        /// Gets all events with their categories included.
+        /// </summary>
+        /// <response code="200">Returns the list of events.</response>
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -59,10 +62,14 @@ namespace RaceDay_Api.Controllers
             return Ok(events);
         }
 
-        // ============================================
+
         // GET: /api/events/{id}
-        // Public - get single event with categories
-        // ============================================
+        /// <summary>
+        /// Gets a single event by its ID with categories.
+        /// </summary>
+        /// <param name="id">The event ID.</param>
+        /// <response code="200">Returns the event details.</response>
+        /// <response code="404">Event not found.</response>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -96,10 +103,17 @@ namespace RaceDay_Api.Controllers
             });
         }
 
-        // ============================================
+
         // POST: /api/events
-        // Organiser only - create new event
-        // ============================================
+        /// <summary>
+        /// Creates a new event. Organiser only.
+        /// </summary>
+        /// <param name="request">Event details including name, description, date, location, distance, 
+        /// and event type.</param>
+        /// <response code="201">Event created successfully.</response>
+        /// <response code="400">Validation failed or invalid EventTypeID.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">Not an Organiser.</response>
         [HttpPost]
         [RoleAuthorize("Organiser")]
         public async Task<IActionResult> Create([FromBody] CreateEventRequest request)
@@ -140,10 +154,17 @@ namespace RaceDay_Api.Controllers
             });
         }
 
-        // ============================================
+   
         // PUT: /api/events/{id}
-        // Organiser only - update own event
-        // ============================================
+        /// <summary>
+        /// Updates an existing event. Organiser only, must own the event.
+        /// </summary>
+        /// <param name="id">The event ID.</param>
+        /// <param name="request">Updated event details.</param>
+        /// <response code="200">Event updated successfully.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">Not an Organiser or not the owner.</response>
+        /// <response code="404">Event not found.</response>
         [HttpPut("{id}")]
         [RoleAuthorize("Organiser")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateEventRequest request)
@@ -170,10 +191,16 @@ namespace RaceDay_Api.Controllers
             return Ok(new { message = "Event updated successfully.", eventId = ev.EventID });
         }
 
-        // ============================================
+        
         // DELETE: /api/events/{id}
-        // Organiser only - delete own event
-        // ============================================
+        /// <summary>
+        /// Deletes an event. Organiser only, must own the event.
+        /// </summary>
+        /// <param name="id">The event ID.</param>
+        /// <response code="204">Event deleted successfully.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">Not an Organiser or not the owner.</response>
+        /// <response code="404">Event not found.</response>
         [HttpDelete("{id}")]
         [RoleAuthorize("Organiser")]
         public async Task<IActionResult> Delete(int id)
