@@ -82,7 +82,7 @@ namespace RaceDay_Api.Controllers
         /// Logs in a user and creates a session.
         /// </summary>
         /// <remarks>
-        /// On success, a session cookie is set that must be included in all subsequent requests.
+        /// If successful, a session cookie is set that must be included in all subsequent requests.
         /// The session stores the user's ID and role.
         /// </remarks>
         /// <param name="request">Login credentials - email and password.</param>
