@@ -8,6 +8,7 @@ CREATE TABLE [User] (
     FullName NVARCHAR(255) NOT NULL, 
     DateOfBirth DATE NOT NULL, 
     EmergencyContact NVARCHAR(50) NOT NULL, 
+    ProfilePictureUrl NVARCHAR(500) NULL,
     Role NVARCHAR(20) NOT NULL CHECK (Role IN ('Organiser', 'Participant')), 
     CreatedDate DATETIME NOT NULL DEFAULT GETDATE() 
 );
@@ -30,7 +31,7 @@ CREATE TABLE Event (
     Location NVARCHAR(255) NOT NULL, 
     Distance NVARCHAR(20) NOT NULL, 
     CreatedDate DATETIME NOT NULL DEFAULT GETDATE(), 
-
+    BannerUrl NVARCHAR(500) NULL,
     CONSTRAINT FK_Event_Organiser FOREIGN KEY (OrganiserID) REFERENCES [User](UserID), 
     CONSTRAINT FK_Event_EventType FOREIGN KEY (EventTypeID) REFERENCES EventType(EventTypeID) 
 );
@@ -58,7 +59,8 @@ CREATE TABLE Enrolment (
     CategoryID INT NOT NULL, 
     EnrolmentDate DATETIME NOT NULL DEFAULT GETDATE(), 
     Withdrawn BIT NOT NULL DEFAULT 0, 
-  
+    Status NVARCHAR(20) NOT NULL DEFAULT 'Confirmed' 
+    CONSTRAINT CK_Enrolment_Status CHECK (Status IN ('Pending', 'Confirmed', 'Cancelled')),
     CONSTRAINT FK_Enrolment_Participant FOREIGN KEY (ParticipantID) REFERENCES [User](UserID), 
     CONSTRAINT FK_Enrolment_Event FOREIGN KEY (EventID) REFERENCES Event(EventID), 
     CONSTRAINT FK_Enrolment_Category FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID), 
