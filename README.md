@@ -23,7 +23,7 @@ RaceDay is a full-stack event management platform designed for the South African
 
 ## Video Presentation
 Part one: [YouTube Video Link](https://youtu.be/SjGEt7v-eVg)
-Part two: [YouTube Video Link]
+Part two: [YouTube Video Link](https://youtu.be/7EWQPeVoZVw)
 ## Part 1 Setup Instructions
 1. Clone the repository
 2. Open the SQL script in SSMS and run it on a fresh database
