@@ -23,10 +23,17 @@ namespace RaceDay_Api.Controllers
             _context = context;
         }
 
-        // ============================================
+        
         // POST: /api/events/{eventId}/enrol
         // Participant only - enrol in an event
-        // ============================================
+        /// <summary>
+        /// Enrols a participant in an event by selecting a category. Participant only.
+        /// </summary>
+        /// <response code="201">Enrolment created successfully.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">Not a Participant.</response>
+        /// <response code="404">Event or category not found.</response>
+        /// <response code="409">Already enrolled in this event.</response>
         [HttpPost("events/{eventId}/enrol")]
         [RoleAuthorize("Participant")]
         public async Task<IActionResult> Enrol(int eventId, [FromBody] EnrolRequest request)
@@ -73,10 +80,9 @@ namespace RaceDay_Api.Controllers
             });
         }
 
-        // ============================================
+        
         // GET: /api/enrolments/{id}
         // Internal use for CreatedAtAction
-        // ============================================
         [HttpGet("enrolments/{id}")]
         [RoleAuthorize("Organiser", "Participant")]
         public async Task<IActionResult> GetById(int id)
@@ -86,10 +92,17 @@ namespace RaceDay_Api.Controllers
             return Ok(enrolment);
         }
 
-        // ============================================
+
         // GET: /api/events/{eventId}/enrolments
         // Organiser only - view all enrolments for own event
-        // ============================================
+        /// <summary>
+        /// Organiser views enrolments for their event
+        /// </summary>
+        /// <response code="201">Enrolment created successfully.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">Not a Participant.</response>
+        /// <response code="404">Event or category not found.</response>
+        /// <response code="409">Already enrolled in this event.</response>
         [HttpGet("events/{eventId}/enrolments")]
         [RoleAuthorize("Organiser")]
         public async Task<IActionResult> GetByEvent(int eventId)
@@ -122,10 +135,17 @@ namespace RaceDay_Api.Controllers
             return Ok(enrolments);
         }
 
-        // ============================================
+
         // GET: /api/users/me/enrolments
-        // Participant only - view own enrolments
-        // ============================================
+        //Participant views their own enrolments
+        /// <summary>
+        /// Enrols a participant in an event by selecting a category. Participant only.
+        /// </summary>
+        /// <response code="201">Enrolment created successfully.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">Not a Participant.</response>
+        /// <response code="404">Event or category not found.</response>
+        /// <response code="409">Already enrolled in this event.</response>
         [HttpGet("users/me/enrolments")]
         [RoleAuthorize("Participant")]
         public async Task<IActionResult> GetMyEnrolments()
@@ -151,10 +171,17 @@ namespace RaceDay_Api.Controllers
             return Ok(enrolments);
         }
 
-        // ============================================
+
         // PUT: /api/enrolments/{id}/withdraw
-        // Participant only - withdraw from event
-        // ============================================
+        //Participant withdraws from an event
+        /// <summary>
+        /// Participant withdraws from an event. Participant only.
+        /// </summary>
+        /// <response code="201">withdrawal successfully.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">Not a Participant.</response>
+        /// <response code="404">Event or category not found.</response>
+        /// <response code="409">Already enrolled in this event.</response>
         [HttpPut("enrolments/{id}/withdraw")]
         [RoleAuthorize("Participant")]
         public async Task<IActionResult> Withdraw(int id)
