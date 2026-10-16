@@ -1,6 +1,6 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
-using RaceDay_Api.Models;
+using RaceDay_Api.Models; 
 
 namespace RaceDay_Api.Models
 {
