@@ -11,8 +11,10 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RaceDay_Api.Controllers
 {
-    // Handles user profile operations.
-    // Both roles can view and update their OWN profile.
+    /// <summary>
+    /// Handles user profile operations for both roles.
+    /// Authenticated users can view and update their own profile.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     [RoleAuthorize("Organiser", "Participant")]
@@ -25,10 +27,11 @@ namespace RaceDay_Api.Controllers
             _context = context;
         }
 
-        // ============================================
-        // GET: /api/users/profile
-        // Get the currently logged-in user's profile
-        // ============================================
+        /// <summary>
+        /// Gets the currently logged-in user's profile.
+        /// </summary>
+        /// <response code="200">Returns the user's profile details.</response>
+        /// <response code="401">Not logged in.</response>
         [HttpGet("profile")]
         public async Task<IActionResult> GetProfile()
         {
@@ -51,10 +54,13 @@ namespace RaceDay_Api.Controllers
             });
         }
 
-        // ============================================
-        // PUT: /api/users/profile
-        // Update the currently logged-in user's profile
-        // ============================================
+        /// <summary>
+        /// Updates the currently logged-in user's profile.
+        /// </summary>
+        /// <param name="request">Fields to update - full name and phone number.</param>
+        /// <response code="200">Profile updated successfully.</response>
+        /// <response code="400">Validation failed.</response>
+        /// <response code="401">Not logged in.</response>
         [HttpPut("profile")]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
         {
