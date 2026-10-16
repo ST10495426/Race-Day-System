@@ -1,0 +1,32 @@
+name: Part 2 - Build and Test API
+
+on:
+  push:
+    branches: [ main, master, Part2-api ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore Part2/RaceDay/RaceDay.slnx
+
+    - name: Build solution
+      run: dotnet build Part2/RaceDay/RaceDay.slnx --no-restore --configuration Release
+
+    - name: Run tests
+      run: dotnet test Part2/RaceDay/RaceDay.slnx --no-build --configuration Release --verbosity normal
+
+    - name: All tests passed
+      run: echo " Build successful and all tests passed!"
