@@ -23,10 +23,16 @@ namespace RaceDay_Api.Controllers
             _context = context;
         }
 
-        // ============================================
+        
         // POST: /api/enrolments/{enrolmentId}/results
-        // Organiser only - capture result for an enrolment
-        // ============================================
+        /// <summary>
+        /// Organiser only can capture result for an enrolment
+        /// </summary>
+        /// <response code="201">Enrolment created successfully.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">Not a Participant.</response>
+        /// <response code="404">Event or category not found.</response>
+        /// <response code="409">Already enrolled in this event.</response>
         [HttpPost("enrolments/{enrolmentId}/results")]
         [RoleAuthorize("Organiser")]
         public async Task<IActionResult> Create(int enrolmentId, [FromBody] CreateResultRequest request)
@@ -68,10 +74,9 @@ namespace RaceDay_Api.Controllers
             });
         }
 
-        // ============================================
+        
         // GET: /api/results/{id}
         // Internal use
-        // ============================================
         [HttpGet("results/{id}")]
         [RoleAuthorize("Organiser", "Participant")]
         public async Task<IActionResult> GetById(int id)
@@ -81,10 +86,9 @@ namespace RaceDay_Api.Controllers
             return Ok(result);
         }
 
-        // ============================================
+        
         // PUT: /api/results/{id}
-        // Organiser only - update result
-        // ============================================
+        // Organiser only - update result        
         [HttpPut("results/{id}")]
         [RoleAuthorize("Organiser")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateResultRequest request)
@@ -112,10 +116,9 @@ namespace RaceDay_Api.Controllers
             });
         }
 
-        // ============================================
+        
         // GET: /api/users/me/results
         // Participant only - view own results
-        // ============================================
         [HttpGet("users/me/results")]
         [RoleAuthorize("Participant")]
         public async Task<IActionResult> GetMyResults()
@@ -149,10 +152,10 @@ namespace RaceDay_Api.Controllers
             return Ok(results);
         }
 
-        // ============================================
+       
         // GET: /api/events/{eventId}/results
         // Organiser only - view all results for own event
-        // ============================================
+        
         [HttpGet("events/{eventId}/results")]
         [RoleAuthorize("Organiser")]
         public async Task<IActionResult> GetByEvent(int eventId)
