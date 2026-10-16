@@ -8,9 +8,10 @@ using RaceDay_Api.Models;
 
 namespace RaceDay_Api.Controllers
 {
-    // Handles event categories (age or distance groups).
-    // Public: viewing categories.
-    // Organiser only: create, update, delete.
+    /// <summary>
+    /// Handles event categories (age or distance groups).
+    /// Public viewing endpoints are open to all. CRUD operations are Organiser only.
+    /// </summary>
     [Route("api")]
     [ApiController]
     public class CategoryController : ControllerBase
@@ -22,10 +23,14 @@ namespace RaceDay_Api.Controllers
             _context = context;
         }
 
-        // ============================================
+      
         // GET: /api/events/{eventId}/categories
-        // Public - all categories for an event
-        // ============================================
+        /// <summary>
+        /// Gets all categories for a specific event.
+        /// </summary>
+        /// <param name="eventId">The event ID.</param>
+        /// <response code="200">Returns the categories.</response>
+        /// <response code="404">Event not found.</response>
         [HttpGet("events/{eventId}/categories")]
         public async Task<IActionResult> GetByEvent(int eventId)
         {
@@ -39,10 +44,14 @@ namespace RaceDay_Api.Controllers
             return Ok(categories);
         }
 
-        // ============================================
+        
         // GET: /api/categories/{id}
-        // Public - single category
-        // ============================================
+        /// <summary>
+        /// Gets a single category by ID.
+        /// </summary>
+        /// <param name="id">The category ID.</param>
+        /// <response code="200">Returns the category.</response>
+        /// <response code="404">Category not found.</response>
         [HttpGet("categories/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -51,10 +60,18 @@ namespace RaceDay_Api.Controllers
             return Ok(category);
         }
 
-        // ============================================
+       
         // POST: /api/events/{eventId}/categories
-        // Organiser only - create category for own event
-        // ============================================
+        /// <summary>
+        /// Creates a new category for an event. Organiser only.
+        /// </summary>
+        /// <param name="eventId">The event ID.</param>
+        /// <param name="request">Category details including name, type, and min/max values.</param>
+        /// <response code="201">Category created successfully.</response>
+        /// <response code="400">Invalid CategoryType.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">Not an Organiser.</response>
+        /// <response code="404">Event not found.</response>
         [HttpPost("events/{eventId}/categories")]
         [RoleAuthorize("Organiser")]
         public async Task<IActionResult> Create(int eventId, [FromBody] CreateCategoryRequest request)
@@ -81,10 +98,18 @@ namespace RaceDay_Api.Controllers
             return CreatedAtAction(nameof(GetById), new { id = category.CategoryID }, category);
         }
 
-        // ============================================
+        
         // PUT: /api/categories/{id}
-        // Organiser only
-        // ============================================
+        /// <summary>
+        /// Updates a category. Organiser only.
+        /// </summary>
+        /// <param name="id">The category ID.</param>
+        /// <param name="request">Updated category details.</param>
+        /// <response code="200">Category updated successfully.</response>
+        /// <response code="400">Invalid CategoryType.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">Not an Organiser.</response>
+        /// <response code="404">Category not found.</response>
         [HttpPut("categories/{id}")]
         [RoleAuthorize("Organiser")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryRequest request)
@@ -104,10 +129,16 @@ namespace RaceDay_Api.Controllers
             return Ok(category);
         }
 
-        // ============================================
+       
         // DELETE: /api/categories/{id}
-        // Organiser only
-        // ============================================
+        /// <summary>
+        /// Deletes a category. Organiser only.
+        /// </summary>
+        /// <param name="id">The category ID.</param>
+        /// <response code="204">Category deleted successfully.</response>
+        /// <response code="401">Not logged in.</response>
+        /// <response code="403">Not an Organiser.</response>
+        /// <response code="404">Category not found.</response>
         [HttpDelete("categories/{id}")]
         [RoleAuthorize("Organiser")]
         public async Task<IActionResult> Delete(int id)
