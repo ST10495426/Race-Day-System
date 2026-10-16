@@ -7,8 +7,10 @@ using RaceDay_Api.Models;
 
 namespace RaceDay_Api.Controllers
 {
-    // Public endpoint to fetch event types (Run, Walk, Cycle).
-    // Used by Organisers when creating events and by Participants browsing.
+    /// <summary>
+    /// Public lookup endpoint for event types (Run, Walk, Cycle).
+    /// Used by Organisers when creating events and by Participants browsing.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class EventTypeController : ControllerBase
@@ -20,10 +22,10 @@ namespace RaceDay_Api.Controllers
             _context = context;
         }
 
-        // ============================================
-        // GET: /api/eventtypes
-        // Get all event types
-        // ============================================
+        /// <summary>
+        /// Gets all available event types.
+        /// </summary>
+        /// <response code="200">Returns the list of event types.</response>
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
