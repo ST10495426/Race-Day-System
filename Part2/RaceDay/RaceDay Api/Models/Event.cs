@@ -6,14 +6,16 @@ namespace RaceDay_Api.Models
 {
     public class Event
     {
-        [Key]
-        public int EventID { get; set; }
+       
 
-        [Required]
+        [Key] //this is the primary key of the table
+        public int EventID { get; set; } // thus this is a unique identifier for each user
+
+        [Required] //this field cannot be empty
         public int OrganiserID { get; set; }
 
         [ForeignKey(nameof(OrganiserID))]
-        public User? Organiser { get; set; }
+        public User? Organiser { get; set; } // ? after string means the field can be null
 
         [Required]
         public int EventTypeID { get; set; }
@@ -22,7 +24,7 @@ namespace RaceDay_Api.Models
         public EventType? EventType { get; set; }
 
         [Required]
-        [MaxLength(255)]
+        [MaxLength(255)] //number of acceptable characters
         public string Name { get; set; } = string.Empty;
 
         public string? Description { get; set; }
@@ -44,7 +46,7 @@ namespace RaceDay_Api.Models
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         // Navigation properties
-        public ICollection<Category> Categories { get; set; } = new List<Category>();
+        public ICollection<Category> Categories { get; set; } = new List<Category>(); //one event can have many categories
         public ICollection<Enrolment> Enrolments { get; set; } = new List<Enrolment>();
     }
 }
