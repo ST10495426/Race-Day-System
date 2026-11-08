@@ -33,7 +33,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowMvc", policy =>
     {
-        policy.WithOrigins("https://localhost:7000")  // Will update in Part 3
+        policy.WithOrigins("https://localhost:7005;http://localhost:5009")  //  updated for Part 3
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();                     // Required for cookies
