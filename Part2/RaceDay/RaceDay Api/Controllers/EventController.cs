@@ -115,7 +115,7 @@ namespace RaceDay_Api.Controllers
         /// <response code="401">Not logged in.</response>
         /// <response code="403">Not an Organiser.</response>
         [HttpPost]
-        [RoleAuthorize("Organiser")]
+        [RoleAuthorize("Organiser")] //enforces role-based access.
         public async Task<IActionResult> Create([FromBody] CreateEventRequest request)
         {
             var organiserId = SessionHelper.GetUserId(HttpContext.Session);
