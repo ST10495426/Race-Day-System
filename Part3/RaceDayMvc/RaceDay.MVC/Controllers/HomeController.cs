@@ -37,5 +37,13 @@ namespace RaceDay.MVC.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public async Task<IActionResult> EventDetails(int id)
+        {
+            var ev = await _api.GetAsync<EventDetailsViewModel>($"api/events/{id}");
+            if (ev == null) return NotFound();
+
+            return View(ev);
+        }
     }
 }
