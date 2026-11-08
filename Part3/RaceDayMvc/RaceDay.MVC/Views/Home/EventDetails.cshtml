@@ -1,0 +1,54 @@
+﻿@model RaceDay.MVC.Models.EventDetailsViewModel
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>@Model.Name</h1>
+            <p class="lead">@Model.Description</p>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Event Information</h5>
+                    <p><strong>Date:</strong> @Model.Date.ToString("f")</p>
+                    <p><strong>Location:</strong> @Model.Location</p>
+                    <p><strong>Distance:</strong> @Model.Distance</p>
+                    <p><strong>Type:</strong> @Model.EventTypeName</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Enrol Now</h5>
+                </div>
+                <div class="card-body">
+                    @if (Context.Request.Cookies[".AspNetCore.Session"] != null)
+                    {
+                        <form asp-controller="Enrolment" asp-action="Enrol" method="post">
+                            <input type="hidden" name="EventID" value="@Model.EventID" />
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Select Category</label>
+                                <select name="CategoryID" class="form-select" required>
+                                    <option value="">-- Choose --</option>
+                                    @foreach (var cat in Model.Categories)
+                                    {
+                                        <option value="@cat.CategoryID">@cat.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success w-100">Enrol</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <p class="text-danger">Please log in to enrol.</p>
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary w-100">Login</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
