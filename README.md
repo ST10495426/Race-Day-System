@@ -26,6 +26,7 @@ This repository contains the complete system:
 ## CI/CD
 ![CI Build]<img width="428" height="65" alt="green light" src="https://github.com/user-attachments/assets/fa3f87ec-b2f8-496f-924a-9e49f1859284" />
 ![CI Build] <img width="182" height="61" alt="green mark" src="https://github.com/user-attachments/assets/8bc53725-9f3c-4295-8394-02fc046889d6" />
+![CI Build]<img width="152" height="23" alt="green" src="https://github.com/user-attachments/assets/120c664b-f40f-4abc-9bd4-220d81f9f3bd" />
 
 
 ## Video Presentation
