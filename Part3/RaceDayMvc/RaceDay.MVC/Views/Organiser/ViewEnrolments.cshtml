@@ -1,22 +1,27 @@
-﻿@{
+﻿@model List<Dictionary<string, object>>
+@{
     ViewData["Title"] = "View Enrolments";
-    var enrolments = ViewBag.Enrolments as List<object>;
 }
 
 <div class="container mt-4">
     <h2>Enrolments (Event ID: @ViewBag.EventID)</h2>
     <a href="/Organiser/Dashboard" class="btn btn-secondary mb-3">Back to Dashboard</a>
 
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-warning">@ViewBag.Error</div>
+    }
+
     <div class="card shadow-sm">
         <div class="card-body">
-            @if (enrolments == null || enrolments.Count == 0)
+            @if (Model == null || Model.Count == 0)
             {
-                <p>No one has enrolled in this event yet.</p>
+                <p class="text-muted">No one has enrolled in this event yet.</p>
             }
             else
             {
                 <table class="table table-striped">
-                    <thead>
+                    <thead class="table-dark">
                         <tr>
                             <th>Participant Name</th>
                             <th>Category</th>
@@ -25,27 +30,23 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in enrolments)
+                        @foreach (var item in Model)
                         {
-                            // We parse the object to read its properties
-                            var json = System.Text.Json.JsonSerializer.Serialize(item);
-                            var doc = System.Text.Json.JsonDocument.Parse(json).RootElement;
-                            
-                            var enrolmentId = doc.GetProperty("enrolmentID").GetInt32();
-                            var participantName = doc.GetProperty("participantName").GetString();
-                            var categoryName = doc.GetProperty("categoryName").GetString();
-                            var status = doc.GetProperty("status").GetString();
-
                             <tr>
-                                <td>@participantName</td>
-                                <td>@categoryName</td>
+                                <td>@item["participantName"]</td>
+                                <td>@item["categoryName"]</td>
                                 <td>
-                                    @if(status == "Confirmed") { <span class="badge bg-success">Confirmed</span> }
-                                    else if(status == "Pending") { <span class="badge bg-warning text-dark">Pending</span> }
-                                    else { <span class="badge bg-danger">@status</span> }
+                                    @if (item["status"].ToString() == "Confirmed")
+                                    {
+                                        <span class="badge bg-success">Confirmed</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">@item["status"]</span>
+                                    }
                                 </td>
                                 <td>
-                                    <a href="/Organiser/CaptureResult?enrolmentId=@enrolmentId" class="btn btn-sm btn-success">Capture Result</a>
+                                    <a href="/Organiser/CaptureResult?enrolmentId=@item["enrolmentID"]" class="btn btn-sm btn-success">Capture Result</a>
                                 </td>
                             </tr>
                         }
