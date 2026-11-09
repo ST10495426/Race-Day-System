@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<Dictionary<string, object>>
+@{
     ViewData["Title"] = "My Results";
 }
 
@@ -6,15 +7,47 @@
     <h2>My Results</h2>
     <p class="text-muted">Your personal race history.</p>
 
-    @if (ViewBag.Results != null)
+    @if (Model == null || Model.Count == 0)
     {
-        <div class="alert alert-success">
-            Results loaded! Data fetching worked.
-        </div>
-        <!-- We will format this properly in the next step -->
+        <div class="alert alert-info">You don't have any results yet.</div>
     }
     else
     {
-        <div class="alert alert-info">You don't have any results yet.</div>
+        <table class="table table-striped shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Event Name</th>
+                    <th>Category</th>
+                    <th>Finish Time</th>
+                    <th>Position</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item["eventName"]</td>
+                        <td>@item["categoryName"]</td>
+                        <td>@item["finishTime"]</td>
+                        <td>@item["position"] / @item["totalFinishers"] finishers</td>
+                        <td>
+                            @if (item["status"].ToString() == "Completed")
+                            {
+                                <span class="badge bg-success">Completed</span>
+                            }
+                            else if (item["status"].ToString() == "DNS")
+                            {
+                                <span class="badge bg-secondary">Did Not Start</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">@item["status"]</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     }
 </div>
