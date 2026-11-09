@@ -1,0 +1,80 @@
+﻿@model IEnumerable<RaceDay.Mvc.Models.CategoryViewModel>
+
+@{
+    ViewData["Title"] = "Manage Categories";
+}
+
+<div class="container mt-4">
+    <h2>Manage Categories (Event ID: @ViewBag.EventID)</h2>
+    <a href="/Organiser/Dashboard" class="btn btn-secondary mb-3">Back to Dashboard</a>
+
+    <div class="row">
+        <!-- Existing Categories -->
+        <div class="col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">Existing Categories</div>
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <p>No categories added yet.</p>
+                    }
+                    else
+                    {
+                        <ul class="list-group">
+                            @foreach (var cat in Model)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>@cat.Name</strong> (@cat.CategoryType)
+                                        @if (cat.MinValue.HasValue || cat.MaxValue.HasValue)
+                                        {
+                                            <span class="text-muted ms-2">Range: @cat.MinValue to @cat.MaxValue</span>
+                                        }
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Add New Category -->
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">Add New Category</div>
+                <div class="card-body">
+                    <form asp-action="AddCategory" method="post">
+                        <input type="hidden" name="eventId" value="@ViewBag.EventID" />
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Category Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g. Senior, 10km" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Type</label>
+                            <select name="type" class="form-select" required>
+                                <option value="Age">Age Group</option>
+                                <option value="Distance">Distance</option>
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Min Value</label>
+                                <input type="number" name="minValue" class="form-control" />
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Max Value</label>
+                                <input type="number" name="maxValue" class="form-control" />
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Add Category</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
