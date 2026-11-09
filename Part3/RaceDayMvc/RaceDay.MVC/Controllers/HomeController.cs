@@ -17,7 +17,7 @@ namespace RaceDay.MVC.Controllers
         public async Task<IActionResult> Index()
         {
             // Fetch events from API
-            var events = await _api.GetAsync<List<EventListViewModel>>("api/events");
+            var events = await _api.GetAsync<List<EventListViewModel>>("api/Event");
 
             if (events == null)
             {
@@ -40,7 +40,7 @@ namespace RaceDay.MVC.Controllers
 
         public async Task<IActionResult> EventDetails(int id)
         {
-            var ev = await _api.GetAsync<EventDetailsViewModel>($"api/events/{id}");
+            var ev = await _api.GetAsync<EventDetailsViewModel>($"api/Event/{id}");
             if (ev == null) return NotFound();
 
             return View(ev);
