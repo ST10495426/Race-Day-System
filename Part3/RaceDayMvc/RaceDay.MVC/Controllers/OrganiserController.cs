@@ -32,6 +32,88 @@ namespace RaceDay.MVC.Controllers
                 return RedirectToAction("Login", "Account");
 
             return View();
+
+                    // ==========================================
+                    // CATEGORIES
+                    // ==========================================
+
+            // GET: /Organiser/ManageCategories/5
+        public async Task<IActionResult> ManageCategories(int id)
+        {
+            if (Request.Cookies[".AspNetCore.Session"] == null) return RedirectToAction("Login", "Account");
+
+            var categories = await _api.GetAsync<List<CategoryViewModel>>($"api/events/{id}/categories");
+            ViewBag.EventID = id;
+
+            return View(categories ?? new List<CategoryViewModel>());
+        }
+
+        // POST: /Organiser/AddCategory
+        [HttpPost]
+        public async Task<IActionResult> AddCategory(int eventId, string name, string type, int? minValue, int? maxValue)
+        {
+            if (Request.Cookies[".AspNetCore.Session"] == null) return RedirectToAction("Login", "Account");
+
+            var categoryData = new
+            {
+                Name = name,
+                CategoryType = type,
+                MinValue = minValue,
+                MaxValue = maxValue
+            };
+
+            await _api.PostAsync($"api/events/{eventId}/categories", categoryData);
+
+            return RedirectToAction("ManageCategories", new { id = eventId });
+        }
+
+        // ==========================================
+        // ENROLMENTS
+        // ==========================================
+
+        // GET: /Organiser/ViewEnrolments/5
+        public async Task<IActionResult> ViewEnrolments(int id)
+        {
+            if (Request.Cookies[".AspNetCore.Session"] == null) return RedirectToAction("Login", "Account");
+
+            // We fetch the raw JSON array from the API
+            var enrolments = await _api.GetAsync<List<object>>($"api/events/{id}/enrolments");
+            ViewBag.EventID = id;
+
+            return View(enrolments);
+        }
+
+        // ==========================================
+        // RESULTS
+        // ==========================================
+
+        // GET: /Organiser/CaptureResult?enrolmentId=10
+        public IActionResult CaptureResult(int enrolmentId)
+        {
+            if (Request.Cookies[".AspNetCore.Session"] == null) return RedirectToAction("Login", "Account");
+
+            ViewBag.EnrolmentID = enrolmentId;
+            return View();
+        }
+
+        // POST: /Organiser/CaptureResult
+        [HttpPost]
+        public async Task<IActionResult> CaptureResult(int enrolmentId, string finishTime, int? position, string status)
+        {
+            if (Request.Cookies[".AspNetCore.Session"] == null) return RedirectToAction("Login", "Account");
+
+            var resultData = new
+            {
+                FinishTime = finishTime,
+                Position = position,
+                Status = status
+            };
+
+            var response = await _api.PostAsync($"api/enrolments/{enrolmentId}/results", resultData);
+
+            // After saving, go back to the dashboard
+            return RedirectToAction("Dashboard");
+        }
         }
 
         // POST: /Organiser/CreateEvent
