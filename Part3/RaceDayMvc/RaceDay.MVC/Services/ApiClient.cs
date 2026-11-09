@@ -7,48 +7,52 @@ namespace RaceDay.MVC.Services
     // It automatically forwards session cookies between the browser, MVC and the API.
     public class ApiClient
     {
-        private readonly HttpClient _httpClient;
+        private readonly HttpClient _http;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ApiClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
+        public ApiClient(HttpClient http, IHttpContextAccessor httpContextAccessor)
         {
-            _httpClient = httpClient;
+            _http = http;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        // Helps to get the cookie from the current browser request
-        private void AttachSessionCookie()
-        {
-            var sessionCookie = _httpContextAccessor.HttpContext?.Request.Cookies[".AspNetCore.Session"];
-            if (!string.IsNullOrEmpty(sessionCookie))
-            {
-                _httpClient.DefaultRequestHeaders.Clear();
-                _httpClient.DefaultRequestHeaders.Add("Cookie", $".AspNetCore.Session={sessionCookie}");
-            }
-        }
-
-        // Helps to save the API's cookie into the browser's cookie collection
-        private void SaveSessionCookie(HttpResponseMessage response)
+        // Extract the cookie from the API response
+        private void SaveCookie(HttpResponseMessage response)
         {
             if (response.Headers.TryGetValues("Set-Cookie", out var cookies))
             {
                 foreach (var cookie in cookies)
                 {
-                    if (cookie.StartsWith(".AspNetCore.Session"))
+                    if (cookie.Contains(".AspNetCore.Session"))
                     {
-                        var cookieValue = cookie.Split(';')[0]; // Extract just the name=value
-                        _httpContextAccessor.HttpContext?.Response.Headers.Append("Set-Cookie", cookieValue);
+                        // Extract just the token value (between '=' and ';')
+                        var parts = cookie.Split(';')[0].Split('=');
+                        if (parts.Length > 1)
+                        {
+                            var cookieValue = parts[1];
+                            _httpContextAccessor.HttpContext?.Session.SetString("ApiCookie", cookieValue);
+                        }
                     }
                 }
             }
         }
 
-        // GET Request
+        // Attach the cookie to the request
+        private void AttachCookie()
+        {
+            var cookie = _httpContextAccessor.HttpContext?.Session.GetString("ApiCookie");
+            if (!string.IsNullOrEmpty(cookie))
+            {
+                _http.DefaultRequestHeaders.Clear();
+                _http.DefaultRequestHeaders.Add("Cookie", $".AspNetCore.Session={cookie}");
+            }
+        }
+
         public async Task<T?> GetAsync<T>(string url)
         {
-            AttachSessionCookie();
-            var response = await _httpClient.GetAsync(url);
-            SaveSessionCookie(response);
+            AttachCookie();
+            var response = await _http.GetAsync(url);
+            SaveCookie(response);
 
             if (response.IsSuccessStatusCode)
             {
@@ -58,31 +62,14 @@ namespace RaceDay.MVC.Services
             return default;
         }
 
-        // POST Request
         public async Task<HttpResponseMessage> PostAsync(string url, object data)
         {
-            AttachSessionCookie();
+            AttachCookie();
             var json = JsonSerializer.Serialize(data);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync(url, content);
-            SaveSessionCookie(response);
-            return response;
-        }
-
-        // PUT Request
-        public async Task<HttpResponseMessage> PutAsync(string url, object? data = null)
-        {
-            AttachSessionCookie();
-            HttpContent? content = null;
-            if (data != null)
-            {
-                var json = JsonSerializer.Serialize(data);
-                content = new StringContent(json, Encoding.UTF8, "application/json");
-            }
-
-            var response = await _httpClient.PutAsync(url, content);
-            SaveSessionCookie(response);
+            var response = await _http.PostAsync(url, content);
+            SaveCookie(response);
             return response;
         }
     }

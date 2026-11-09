@@ -13,41 +13,46 @@ namespace RaceDay.MVC.Controllers
             _api = api;
         }
 
-        // GET: /Account/Login
         [HttpGet]
         public IActionResult Login()
         {
-           return View();
+            return View();
         }
 
-        // POST: /Account/Login
         [HttpPost]
-        public async Task <IActionResult> Login( LoginViewModel model)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (!ModelState.IsValid ) return View( model);
+            if (!ModelState.IsValid) return View(model);
 
-            // Send data to API
-            var response =await _api.PostAsync ("api/auth/login", model);
+            // Send login request to API
+            var response = await _api.PostAsync("api/auth/login", model);
 
-            if  (response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
-                // API returns a cookie. Our ApiClient handled saving it to the browser.
-                return RedirectToAction ("Index", "Home");
+                // The ApiClient automatically grabbed the cookie and saved it in our Session.
+                // Let's double check it actually saved.
+                var hasCookie = HttpContext.Session.GetString("ApiCookie");
+
+                if (string.IsNullOrEmpty(hasCookie))
+                {
+                    ModelState.AddModelError("", "Login succeeded, but session failed to save.");
+                    return View(model);
+                }
+
+                // Success! Go to Home
+                return RedirectToAction("Index", "Home");
             }
 
-            // If failed (401 Unauthorized)
-            ModelState.AddModelError("","Invalid email or password." );
+            ModelState.AddModelError("", "Invalid email or password.");
             return View(model);
         }
 
-        // GET: /Account/Register
         [HttpGet]
         public IActionResult Register()
         {
-             return View();
+            return View();
         }
 
-        // POST: /Account/Register
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
@@ -59,26 +64,21 @@ namespace RaceDay.MVC.Controllers
             {
                 // Automatically log them in after registering
                 var loginModel = new LoginViewModel { Email = model.Email, Password = model.Password };
-                await _api.PostAsync ("api/auth/login", loginModel);
+                await _api.PostAsync("api/auth/login", loginModel);
 
-                return RedirectToAction ("Index", "Home");
+                return RedirectToAction("Index", "Home");
             }
 
-            ModelState.AddModelError("","Registration failed. Email might already exist." );
-            return  View(model);
+            ModelState.AddModelError("", "Registration failed. Email might already exist.");
+            return View(model);
         }
 
-        // POST: /Account/Logout
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            // Tell API to clear session
-            await _api.PostAsync ( "api/auth/logout",new { });
-
-            // Clear browser cookies 
-            Response.Cookies.Delete(".AspNetCore.Session" );
-
-            return RedirectToAction("Login");
+            await _api.PostAsync("api/auth/logout", new { });
+            HttpContext.Session.Clear(); // Wipe the MVC session clean
+            return RedirectToAction("Index", "Home");
         }
     }
 }

@@ -45,7 +45,13 @@ builder.Services.AddScoped<PasswordHasher>();
 
 // Add services to the container and swagger.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        // This forces the API to process the request even if it thinks the data is bad,
+        // so we can see the real error!
+        options.SuppressModelStateInvalidFilter = true;
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

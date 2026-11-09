@@ -13,34 +13,83 @@ namespace RaceDay.MVC.Controllers
             _api = api;
         }
 
+        // Helpe method to check if user is logged in
+        private bool IsLoggedIn()
+        {
+            return HttpContext.Session.GetString("ApiCookie") != null;
+        }
+
         // GET: /Organiser/Dashboard
         public async Task<IActionResult> Dashboard()
         {
-            if (Request.Cookies[".AspNetCore.Session"] == null)
+            if (!IsLoggedIn())
                 return RedirectToAction("Login", "Account");
 
-            // Fetch all events (we will filter them by organiser in the view for now)
             var events = await _api.GetAsync<List<EventListViewModel>>("api/events");
-
             return View(events ?? new List<EventListViewModel>());
         }
 
         // GET: /Organiser/CreateEvent
         public IActionResult CreateEvent()
         {
-            if (Request.Cookies[".AspNetCore.Session"] == null)
+            if (!IsLoggedIn())
                 return RedirectToAction("Login", "Account");
 
             return View();
+        }
 
-                    // ==========================================
-                    // CATEGORIES
-                    // ==========================================
+        // POST: /Organiser/CreateEvent
+        [HttpPost]
+        public async Task<IActionResult> CreateEvent(string Name, string Description, DateTime Date, string Location, string Distance, int EventTypeID)
+        {
+            if (!IsLoggedIn())
+                return RedirectToAction("Login", "Account");
 
-            // GET: /Organiser/ManageCategories/5
+            try
+            {
+                var eventData = new
+                {
+                    Name = Name,
+                    Description = Description,
+                    Date = Date.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    Location = Location,
+                    Distance = Distance,
+                    EventTypeID = EventTypeID
+                };
+
+                var response = await _api.PostAsync("api/events", eventData);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction("Dashboard");
+                }
+
+                // Read the error
+                var errorDetails = await response.Content.ReadAsStringAsync();
+
+                if (string.IsNullOrWhiteSpace(errorDetails))
+                {
+                    errorDetails = "The API returned an empty error. Check the API Console window in Visual Studio for the crash log.";
+                }
+
+                ViewBag.Error = $"Status: {response.StatusCode} | Details: {errorDetails}";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Exception: " + ex.Message;
+            }
+
+            return View();
+        }
+
+        // ==========================================
+        // CATEGORIES
+        // ==========================================
+
+        // GET: /Organiser/ManageCategories/5
         public async Task<IActionResult> ManageCategories(int id)
         {
-            if (Request.Cookies[".AspNetCore.Session"] == null) return RedirectToAction("Login", "Account");
+            if (!IsLoggedIn()) return RedirectToAction("Login", "Account");
 
             var categories = await _api.GetAsync<List<CategoryViewModel>>($"api/events/{id}/categories");
             ViewBag.EventID = id;
@@ -50,16 +99,20 @@ namespace RaceDay.MVC.Controllers
 
         // POST: /Organiser/AddCategory
         [HttpPost]
-        public async Task<IActionResult> AddCategory(int eventId, string name, string type, int? minValue, int? maxValue)
+        public async Task<IActionResult> AddCategory(int eventId, string name, string type, string minValue, string maxValue)
         {
-            if (Request.Cookies[".AspNetCore.Session"] == null) return RedirectToAction("Login", "Account");
+            if (!IsLoggedIn()) return RedirectToAction("Login", "Account");
+
+            // Convert empty strings to null for the API
+            int? min = string.IsNullOrEmpty(minValue) ? null : int.Parse(minValue);
+            int? max = string.IsNullOrEmpty(maxValue) ? null : int.Parse(maxValue);
 
             var categoryData = new
             {
                 Name = name,
                 CategoryType = type,
-                MinValue = minValue,
-                MaxValue = maxValue
+                MinValue = min,
+                MaxValue = max
             };
 
             await _api.PostAsync($"api/events/{eventId}/categories", categoryData);
@@ -74,9 +127,8 @@ namespace RaceDay.MVC.Controllers
         // GET: /Organiser/ViewEnrolments/5
         public async Task<IActionResult> ViewEnrolments(int id)
         {
-            if (Request.Cookies[".AspNetCore.Session"] == null) return RedirectToAction("Login", "Account");
+            if (!IsLoggedIn()) return RedirectToAction("Login", "Account");
 
-            // We fetch the raw JSON array from the API
             var enrolments = await _api.GetAsync<List<object>>($"api/events/{id}/enrolments");
             ViewBag.EventID = id;
 
@@ -90,7 +142,7 @@ namespace RaceDay.MVC.Controllers
         // GET: /Organiser/CaptureResult?enrolmentId=10
         public IActionResult CaptureResult(int enrolmentId)
         {
-            if (Request.Cookies[".AspNetCore.Session"] == null) return RedirectToAction("Login", "Account");
+            if (!IsLoggedIn()) return RedirectToAction("Login", "Account");
 
             ViewBag.EnrolmentID = enrolmentId;
             return View();
@@ -100,48 +152,29 @@ namespace RaceDay.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> CaptureResult(int enrolmentId, string finishTime, int? position, string status)
         {
-            if (Request.Cookies[".AspNetCore.Session"] == null) return RedirectToAction("Login", "Account");
+            if (!IsLoggedIn()) return RedirectToAction("Login", "Account");
+
+            // Format finishTime if provided (API expects HH:MM:SS)
+            string? formattedTime = null;
+            if (!string.IsNullOrEmpty(finishTime))
+            {
+                // If user typed "02:15:30", TimeSpan can parse it
+                if (TimeSpan.TryParse(finishTime, out var ts))
+                {
+                    formattedTime = ts.ToString(@"hh\:mm\:ss");
+                }
+            }
 
             var resultData = new
             {
-                FinishTime = finishTime,
+                FinishTime = formattedTime,
                 Position = position,
                 Status = status
             };
 
-            var response = await _api.PostAsync($"api/enrolments/{enrolmentId}/results", resultData);
+            await _api.PostAsync($"api/enrolments/{enrolmentId}/results", resultData);
 
-            // After saving, go back to the dashboard
             return RedirectToAction("Dashboard");
-        }
-        }
-
-        // POST: /Organiser/CreateEvent
-        [HttpPost]
-        public async Task<IActionResult> CreateEvent(string Name, string Description, DateTime Date, string Location, string Distance, int EventTypeID)
-        {
-            if (Request.Cookies[".AspNetCore.Session"] == null)
-                return RedirectToAction("Login", "Account");
-
-            var eventData = new
-            {
-                Name = Name,
-                Description = Description,
-                Date = Date,
-                Location = Location,
-                Distance = Distance,
-                EventTypeID = EventTypeID
-            };
-
-            var response = await _api.PostAsync("api/events", eventData);
-
-            if (response.IsSuccessStatusCode)
-            {
-                return RedirectToAction("Dashboard");
-            }
-
-            ViewBag.Error = "Could not create event. Please check your inputs.";
-            return View();
         }
     }
 }

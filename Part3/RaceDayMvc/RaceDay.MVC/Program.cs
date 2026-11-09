@@ -8,7 +8,7 @@ builder.Services.AddControllersWithViews();
 // Register HttpClient for the API
 builder.Services.AddHttpClient<ApiClient>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7005/");
+    client.BaseAddress = new Uri("https://localhost:7182/");
 });
 
 // Required to access HttpContext inside ApiClient for cookies
