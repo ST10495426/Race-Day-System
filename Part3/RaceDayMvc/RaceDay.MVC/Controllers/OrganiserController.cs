@@ -13,7 +13,7 @@ namespace RaceDay.MVC.Controllers
             _api = api;
         }
 
-        // Helpe method to check if user is logged in
+        // Helps method to check if user is logged in
         private bool IsLoggedIn()
         {
             return HttpContext.Session.GetString("ApiCookie") != null;
@@ -22,10 +22,10 @@ namespace RaceDay.MVC.Controllers
         // GET: /Organiser/Dashboard
         public async Task<IActionResult> Dashboard()
         {
-            if (!IsLoggedIn())
-                return RedirectToAction("Login", "Account");
+            if (!IsLoggedIn()) return RedirectToAction("Login", "Account");
 
-            var events = await _api.GetAsync<List<EventListViewModel>>("api/events");
+            // Ensure this route is "api/Event"
+            var events = await _api.GetAsync<List<EventListViewModel>>("api/Event");
             return View(events ?? new List<EventListViewModel>());
         }
 
@@ -57,7 +57,7 @@ namespace RaceDay.MVC.Controllers
                     EventTypeID = EventTypeID
                 };
 
-                var response = await _api.PostAsync("api/events", eventData);
+                var response = await _api.PostAsync("api/Event", eventData);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -91,7 +91,7 @@ namespace RaceDay.MVC.Controllers
         {
             if (!IsLoggedIn()) return RedirectToAction("Login", "Account");
 
-            var categories = await _api.GetAsync<List<CategoryViewModel>>($"api/events/{id}/categories");
+            var categories = await _api.GetAsync<List<CategoryViewModel>>($"api/Event/{id}/categories");
             ViewBag.EventID = id;
 
             return View(categories ?? new List<CategoryViewModel>());
@@ -130,9 +130,26 @@ namespace RaceDay.MVC.Controllers
             if (!IsLoggedIn()) return RedirectToAction("Login", "Account");
 
             var enrolments = await _api.GetAsync<List<object>>($"api/events/{id}/enrolments");
-            ViewBag.EventID = id;
 
-            return View(enrolments);
+            if (enrolments == null)
+            {
+                // If it's null, it means the API returned an error (like 403 Forbidden)
+                ViewBag.Error = "Could not load enrolments. You might not have permission to view this event's data, or there are no enrolments yet.";
+                ViewBag.EventID = id;
+                return View(new List<Dictionary<string, object>>());
+            }
+
+            // Parse the JSON array into a list of dictionaries
+            var parsedEnrolments = new List<Dictionary<string, object>>();
+            foreach (var item in enrolments)
+            {
+                var json = System.Text.Json.JsonSerializer.Serialize(item);
+                var dict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                if (dict != null) parsedEnrolments.Add(dict);
+            }
+
+            ViewBag.EventID = id;
+            return View(parsedEnrolments);
         }
 
         // ==========================================
