@@ -38,6 +38,13 @@ namespace RaceDay.MVC.Controllers
                     ModelState.AddModelError("", "Login succeeded, but session failed to save.");
                     return View(model);
                 }
+                // Get the user's role from the API response
+                var content = await response.Content.ReadAsStringAsync();
+                var userObj = System.Text.Json.JsonDocument.Parse(content).RootElement;
+                var role = userObj.GetProperty("role").GetString();
+
+                // Save it in the MVC session
+                HttpContext.Session.SetString("UserRole", role ?? "Participant");
 
                 // Success! Go to Home
                 return RedirectToAction("Index", "Home");
