@@ -32,7 +32,7 @@ This repository contains the complete system:
 ## Video Presentation
 Part one: [YouTube Video Link](https://youtu.be/SjGEt7v-eVg)
 Part two: [YouTube Video Link](https://youtu.be/7EWQPeVoZVw)
-Part three:
+Part three: [YouTube Video Link](https://youtu.be/o0tymYDNuQo)
 ## Part 1 Setup Instructions
 1. Clone the repository
 2. Open the SQL script in SSMS and run it on a fresh database
